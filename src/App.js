@@ -1,25 +1,35 @@
-import logo from './logo.svg';
+import {useEffect, useState} from 'react'
+import Login from './components/Login'
+import Home from './components/Home'
+import CreateEvent from './components/CreateEvent'
+
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [page, setPage] = useState('login')
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    if (localStorage.getItem('accessToken')) {
+      setPage('public-events')
+    }
+  }, [])
+
+  const logout = () => {
+    setPage('login')
+    setUser(null)
+    localStorage.clear()
+    window.location.reload();
+  }
+
+  switch (page) {
+    case 'public-events': return <Home user={localStorage.getItem('accessToken')} setPage={setPage} logout={logout} />
+    case 'create-event': return <CreateEvent setPage={setPage} user={user} logout={logout} />
+    default: return <Login setPage={setPage} user={user} callback={(user) => {
+      setUser(user)
+      setPage('public-events')
+    }} />
+  }
 }
 
 export default App;
